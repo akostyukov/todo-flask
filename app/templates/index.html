@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>To Do</title>
+</head>
+<body>
+    <form action="{{ url_for('add_task') }}" method="post">
+        Task name: <input type="text" name="task" autofocus required>
+        <input type="submit" value="Добавить">
+    </form><br><br>
+
+    {% if tasks or done_tasks %}
+
+        {% for task in tasks %}
+            {{ task.task }} <a href="{{ url_for('done', task_id=task.id) }}">Выполнить</a> <a href="{{ url_for('delete_task', task_id=task.id) }}">Удалить</a><br>
+        {% endfor %}
+
+        {% for done_task in done_tasks %}
+            <s>{{ done_task.task }}</s> <a href="{{ url_for('delete_task', task_id=done_task.id) }}">Удалить</a><br>
+        {% endfor %}
+
+    <a href="{{ url_for('clear') }}">Отчистить</a>
+
+    {% else %}
+        Список пуст
+    {% endif %}
+
+</body>
+</html>
