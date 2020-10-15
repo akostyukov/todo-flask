@@ -26,5 +26,9 @@
         Список пуст
     {% endif %}
 
+    {% if current_user.is_authenticated %}
+    <br><br><a href="{{ url_for('logout') }}">Выйти </a>(<b>{{ current_user.login }}</b>)
+    {% endif %}
+
 </body>
 </html>
