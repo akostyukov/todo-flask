@@ -20,7 +20,7 @@ def login():
 
         user = User.query.filter_by(login=user_login).first()
 
-        if not user or user.password != user_password:
+        if not user or not user.check_password(user_password):
             flash('Ошибка авторизации!')
             return redirect(url_for('login'))
 
