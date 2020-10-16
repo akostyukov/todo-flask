@@ -5,8 +5,18 @@
     <title>To Do</title>
 </head>
 <body>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div>
+                <font color="green">{{ messages[0] }}</font><br><br>
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <form action="{{ url_for('add_task') }}" method="post">
-        Task name: <input type="text" name="task" autofocus required>
+        {{ form.csrf_token }}
+        {{ form.task }}
         <input type="submit" value="Добавить">
     </form><br><br>
 

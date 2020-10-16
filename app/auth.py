@@ -3,20 +3,28 @@ from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 
 from app import app
+from app.forms import UserForm
 from app.models import User, db
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_login = request.form['login']
-        user_password = request.form['password']
+        form = UserForm(request.form)
+
+        if form.validate_on_submit():
+            user_login = form.login.data
+            user_password = form.password.data
+        else:
+            return redirect(url_for('login'))
+
         user = User.query.filter_by(login=user_login).first()
 
         if not user or user.password != user_password:
             flash('Ошибка авторизации!')
             return redirect(url_for('login'))
 
+        flash(f'Привет, {user.login}!')
         login_user(user, remember=True)
         return redirect(url_for('task_list'))
     else:
@@ -25,14 +33,21 @@ def login():
 
         return render_template(
             'auth/login.html',
-            users=User.query.all()
+            users=User.query.all(),
+            form=UserForm()
         )
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        db.session.add(User(request.form['login'], password=request.form['password']))
+        form = UserForm(request.form)
+
+        if form.validate_on_submit():
+            db.session.add(User(form.login.data, form.password.data))
+        else:
+            return redirect(url_for('register'))
+
         try:
             db.session.commit()
         except IntegrityError:
@@ -43,7 +58,7 @@ def register():
         if current_user.is_authenticated:
             return redirect(url_for('task_list'))
 
-        return render_template('auth/register.html')
+        return render_template('auth/register.html', form=UserForm())
 
 
 @app.route('/logout')

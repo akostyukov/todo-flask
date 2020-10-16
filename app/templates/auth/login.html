@@ -7,15 +7,16 @@
 <body>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <div class="notification is-danger">
+            <div>
                 <font color="red">{{ messages[0] }}</font><br><br>
             </div>
         {% endif %}
     {% endwith %}
 
     <form method="post">
-        Логин: <input type="text" name="login"><br><br>
-        Пароль: <input type="text" name="password"><br><br>
+        {{ form.csrf_token }}
+        Логин: {{ form.login }}<br><br>
+        Пароль: {{ form.password }}<br><br>
         <input type="submit" value="Войти">
     </form>
 
