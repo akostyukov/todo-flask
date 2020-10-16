@@ -53,6 +53,8 @@ def register():
         except IntegrityError:
             flash("Пользователь с таким логином существует!")
             return redirect(url_for('register'))
+
+        flash('Регистрация прошла успешно!', 'success')
         return redirect(url_for('login'))
     else:
         if current_user.is_authenticated:

@@ -8,5 +8,5 @@ class TaskForm(FlaskForm):
 
 
 class UserForm(FlaskForm):
-    login = StringField(validators=[DataRequired(), Length(min=4, max=10)])
+    login = StringField(validators=[DataRequired(), Length(min=4, max=15)])
     password = PasswordField(validators=[DataRequired(), Length(min=4, max=20)])
