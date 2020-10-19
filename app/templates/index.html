@@ -23,7 +23,7 @@
     {% if tasks or done_tasks %}
 
         {% for task in tasks %}
-            <big>{{ task.task }}</big> <a href="{{ url_for('done', task_id=task.id) }}">Выполнить</a> <a href="{{ url_for('delete_task', task_id=task.id) }}">Удалить</a><br>
+            <big>{{ task.task }}</big> <a href="{{ url_for('done', task_id=task.id) }}">Сделано</a> <a href="{{ url_for('delete_task', task_id=task.id) }}">Удалить</a><br>
         {% endfor %}
 
         {% for done_task in done_tasks %}

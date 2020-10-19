@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash
+from flask.views import MethodView
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 
@@ -7,9 +8,33 @@ from app.forms import UserForm
 from app.models import User, db
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
+class FormView(MethodView):
+    form = None
+    success_url = ''
+    fail_url = ''
+
+    def get_context(self):
+        return {}
+
+    def get(self, request):
+        return render_template(self.form, **self.get_context())
+
+    def post(self, request):
+        form = self.form(request.form)
+
+        if form.validate_on_submit():
+            form.process()
+            form.save()
+            return redirect(self.success_url)
+        return redirect(self.fail_url)
+
+
+# @app.route('/v1/login', methods=['GET', 'POST'])
+class LoginView(FormView):
+    def get_context(self):
+        return {'users': User.query.all()}
+
+    def post(self, request):
         form = UserForm(request.form)
 
         if form.validate_on_submit():
@@ -27,40 +52,23 @@ def login():
         flash(f'Привет, {user.login}!')
         login_user(user, remember=True)
         return redirect(url_for('task_list'))
-    else:
+
+    def get(self):
         if current_user.is_authenticated:
             return redirect(url_for('task_list'))
 
-        return render_template(
-            'auth/login.html',
-            users=User.query.all(),
-            form=UserForm()
-        )
+        super().get(0)
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        form = UserForm(request.form)
+class RegisterView(FormView):
+    form = UserForm()
 
-        if form.validate_on_submit():
-            db.session.add(User(form.login.data, form.password.data))
-        else:
-            return redirect(url_for('register'))
-
-        try:
-            db.session.commit()
-        except IntegrityError:
-            flash("Пользователь с таким логином существует!")
-            return redirect(url_for('register'))
-
-        flash('Регистрация прошла успешно!', 'success')
-        return redirect(url_for('login'))
-    else:
+    # @app.route('/register', methods=['GET', 'POST'])
+    def get(self):
         if current_user.is_authenticated:
             return redirect(url_for('task_list'))
 
-        return render_template('auth/register.html', form=UserForm())
+        return super().get()
 
 
 @app.route('/logout')
@@ -68,3 +76,7 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+app.route('/login', methods=['GET', 'POST'])(LoginView.as_view())
+app.route('/register', methods=['GET', 'POST'])(RegisterView.as_view())

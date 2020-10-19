@@ -18,9 +18,9 @@ class Task(db.Model):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    login = db.Column(db.String(10), nullable=False, unique=True)
+    login = db.Column(db.String(15), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
-    tasks = db.relationship('Task', lazy=True)
+    tasks = db.relationship('Task')
 
     def __init__(self, login, password):
         self.login = login
