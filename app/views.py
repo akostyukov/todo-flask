@@ -17,7 +17,7 @@ def task_list():
     )
 
 
-@app.route('/add', methods=['POST'])
+@app.route('/', methods=['POST'])
 @login_required
 def add_task():
     form = TaskForm(request.form)

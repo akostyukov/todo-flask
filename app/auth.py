@@ -23,16 +23,14 @@ class FormView(MethodView):
         form = self.form(request.form)
 
         if form.validate_on_submit():
-            form.process()
             form.save()
             return redirect(self.success_url)
         return redirect(self.fail_url)
 
 
-# @app.route('/v1/login', methods=['GET', 'POST'])
 class LoginView(FormView):
     def get_context(self):
-        return {'users': User.query.all()}
+        return {'form': self.form}
 
     def post(self, request):
         form = UserForm(request.form)
@@ -57,14 +55,16 @@ class LoginView(FormView):
         if current_user.is_authenticated:
             return redirect(url_for('task_list'))
 
-        super().get(0)
+        super().get()
 
 
 class RegisterView(FormView):
-    form = UserForm()
+    success_url = 'index.html'
+    fail_url = 'auth/login.html'
 
-    # @app.route('/register', methods=['GET', 'POST'])
     def get(self):
+        form = UserForm()
+
         if current_user.is_authenticated:
             return redirect(url_for('task_list'))
 
@@ -78,5 +78,5 @@ def logout():
     return redirect(url_for('login'))
 
 
-app.route('/login', methods=['GET', 'POST'])(LoginView.as_view())
-app.route('/register', methods=['GET', 'POST'])(RegisterView.as_view())
+app.add_url_rule('/login', view_func=LoginView.as_view('login'))
+app.add_url_rule('/register', view_func=RegisterView.as_view('register'))
