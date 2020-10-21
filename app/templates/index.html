@@ -14,7 +14,7 @@
         {% endif %}
     {% endwith %}
 
-    <form action="{{ url_for('add_task') }}" method="post">
+    <form action="{{ url_for('task_list') }}" method="post">
         {{ form.csrf_token }}
         {{ form.task }}
         <input type="submit" value="Добавить">
@@ -23,7 +23,7 @@
     {% if tasks or done_tasks %}
 
         {% for task in tasks %}
-            <big>{{ task.task }}</big> <a href="{{ url_for('done', task_id=task.id) }}">Сделано</a> <a href="{{ url_for('delete_task', task_id=task.id) }}">Удалить</a><br>
+            <big>{{ task.task }}</big> <a href="{{ url_for('do_task', task_id=task.id) }}">Сделано</a> <a href="{{ url_for('delete_task', task_id=task.id) }}">Удалить</a><br>
         {% endfor %}
 
         {% for done_task in done_tasks %}

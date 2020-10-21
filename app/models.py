@@ -1,4 +1,4 @@
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -14,6 +14,19 @@ class Task(db.Model):
     def __init__(self, task, user_id):
         self.task = task
         self.user_id = user_id
+
+    def set_done(self):
+        self.status = False
+        db.session.commit()
+
+    def delete_task(self):
+        db.session.delete(Task.query.get(self.id))
+        db.session.commit()
+
+    @staticmethod
+    def clear_all():
+        db.session.query(Task).filter(Task.user_id == current_user.id).delete()
+        db.session.commit()
 
 
 class User(db.Model, UserMixin):

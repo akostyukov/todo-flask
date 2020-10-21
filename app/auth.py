@@ -10,30 +10,42 @@ from app.models import User, db
 
 class FormView(MethodView):
     form = None
+    template = ''
     success_url = ''
     fail_url = ''
 
     def get_context(self):
         return {}
 
-    def get(self, request):
-        return render_template(self.form, **self.get_context())
+    def get(self):
+        return render_template(self.template, **self.get_context())
 
-    def post(self, request):
+    def post(self):
         form = self.form(request.form)
 
         if form.validate_on_submit():
             form.save()
-            return redirect(self.success_url)
-        return redirect(self.fail_url)
+            return redirect(url_for(self.success_url))
+        return redirect(url_for(self.fail_url))
 
 
 class LoginView(FormView):
-    def get_context(self):
-        return {'form': self.form}
+    form = UserForm
+    template = 'auth/login.html'
+    success_url = 'task_list'
+    fail_url = 'login'
 
-    def post(self, request):
-        form = UserForm(request.form)
+    def get_context(self):
+        return {'form': UserForm()}
+
+    def get(self):
+        if current_user.is_authenticated:
+            return redirect(url_for('task_list'))
+
+        return super().get()
+
+    def post(self):
+        form = self.form(request.form)
 
         if form.validate_on_submit():
             user_login = form.login.data
@@ -51,20 +63,17 @@ class LoginView(FormView):
         login_user(user, remember=True)
         return redirect(url_for('task_list'))
 
-    def get(self):
-        if current_user.is_authenticated:
-            return redirect(url_for('task_list'))
-
-        super().get()
-
 
 class RegisterView(FormView):
-    success_url = 'index.html'
-    fail_url = 'auth/login.html'
+    form = UserForm
+    template = 'auth/register.html'
+    success_url = 'login'
+    fail_url = 'register'
+
+    def get_context(self):
+        return {'form': UserForm()}
 
     def get(self):
-        form = UserForm()
-
         if current_user.is_authenticated:
             return redirect(url_for('task_list'))
 
