@@ -1,11 +1,10 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask.views import MethodView
 from flask_login import login_user, login_required, logout_user, current_user
-from sqlalchemy.exc import IntegrityError
 
 from app import app
 from app.forms import UserForm
-from app.models import User, db
+from app.models import User
 
 
 class FormView(MethodView):
@@ -47,21 +46,21 @@ class LoginView(FormView):
     def post(self):
         form = self.form(request.form)
 
-        if form.validate_on_submit():
-            user_login = form.login.data
-            user_password = form.password.data
-        else:
-            return redirect(url_for('login'))
+        # if form.validate_on_submit():
+            # user_login = form.login.data
+            # user_password = form.password.data
+        # else:
+        #     return redirect(url_for('login'))
 
-        user = User.query.filter_by(login=user_login).first()
-
-        if not user or not user.check_password(user_password):
-            flash('Ошибка авторизации!')
-            return redirect(url_for('login'))
-
-        flash(f'Привет, {user.login}!')
-        login_user(user, remember=True)
-        return redirect(url_for('task_list'))
+        # user = User.query.filter_by(login=user_login).first()
+        #
+        # if not user or not user.check_password(user_password):
+        #     flash('Ошибка авторизации!')
+        #     return redirect(url_for('login'))
+        #
+        # flash(f'Привет, {user.login}!')
+        # login_user(user, remember=True)
+        # return redirect(url_for('task_list')) - Вообще не нужно
 
 
 class RegisterView(FormView):

@@ -1,8 +1,7 @@
-from flask_login import current_user
+from flask_login import current_user, login_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Length
-from flask import redirect, url_for, flash
 
 from app import db
 from .models import User, Task
@@ -23,3 +22,4 @@ class UserForm(FlaskForm):
     def save(self):
         db.session.add(User(self.login.data, self.password.data))
         db.session.commit()
+        # login_user(user, remember=True)
