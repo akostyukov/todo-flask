@@ -1,4 +1,5 @@
 from flask import redirect, url_for
+from flask.views import MethodView
 from flask_login import login_required, logout_user, current_user
 
 from app import app
@@ -32,12 +33,15 @@ class RegisterView(FormView):
         return super().get()
 
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
+class LogoutView(MethodView):
+    decorators = [login_required]
+
+    @staticmethod
+    def get():
+        logout_user()
+        return redirect(url_for('login'))
 
 
 app.add_url_rule('/login', view_func=LoginView.as_view('login'))
 app.add_url_rule('/register', view_func=RegisterView.as_view('register'))
+app.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))
