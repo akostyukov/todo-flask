@@ -1,4 +1,5 @@
 from flask import redirect, url_for
+from flask.views import MethodView
 from flask_login import login_required, current_user
 
 from app import app
@@ -25,12 +26,11 @@ class TaskView(FormView):
         return super().post()
 
 
-class DeleteTaskView:
+class DeleteTaskView(MethodView):
     decorators = [login_required]
 
     @staticmethod
-    @app.route('/delete/<int:task_id>')
-    def delete_task(task_id):
+    def get(task_id):
         task = Task.query.get(task_id)
 
         if task.user_id == current_user.id:
@@ -38,12 +38,11 @@ class DeleteTaskView:
         return redirect(url_for('task_list'))
 
 
-class DoneTaskView:
+class DoneTaskView(MethodView):
     decorators = [login_required]
 
     @staticmethod
-    @app.route('/done/<int:task_id>')
-    def do_task(task_id):
+    def get(task_id):
         task = Task.query.get(task_id)
 
         if task.user_id == current_user.id:
@@ -51,14 +50,15 @@ class DoneTaskView:
         return redirect(url_for('task_list'))
 
 
-class ClearTasksView:
+class ClearTasksView(MethodView):
     decorators = [login_required]
 
-    @staticmethod
-    @app.route('/clear')
-    def clear():
+    def get(self):
         Task.clear_all()
         return redirect(url_for('task_list'))
 
 
 app.add_url_rule('/', view_func=TaskView.as_view('task_list'))
+app.add_url_rule('/done/<int:task_id>', view_func=DoneTaskView.as_view('do_task'))
+app.add_url_rule('/delete/<int:task_id>', view_func=DeleteTaskView.as_view('delete_task'))
+app.add_url_rule('/clear', view_func=ClearTasksView.as_view('clear'))
