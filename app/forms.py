@@ -1,12 +1,26 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired, Length
+from flask import render_template, request, redirect, url_for
+from flask.views import MethodView
 
 
-class TaskForm(FlaskForm):
-    task = StringField(validators=[DataRequired(), Length(min=1, max=30)], render_kw={'autofocus': True})
+class FormView(MethodView):
+    form = None
+    template = ''
+    success_url = ''
+    fail_url = ''
 
+    def get_context(self):
+        return {}
 
-class UserForm(FlaskForm):
-    login = StringField(validators=[DataRequired(), Length(min=4, max=15)], render_kw={'autofocus': True})
-    password = PasswordField(validators=[DataRequired(), Length(min=4, max=20)])
+    def get(self):
+        return render_template(self.template, form=self.form(), **self.get_context())
+
+    def post(self):
+        form = self.form(request.form)
+
+        if form.validate_on_submit():
+            try:
+                form.save()
+            except:
+                return redirect(url_for(self.fail_url))
+            else:
+                return redirect(url_for(self.success_url))
