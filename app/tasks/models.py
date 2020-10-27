@@ -23,6 +23,6 @@ class Task(db.Model):
         db.session.delete(Task.query.get(self.id))
 
     @staticmethod
-    @commit_transaction
     def clear_all():
         db.session.query(Task).filter(Task.user_id == current_user.id).delete()
+        db.session.commit()
