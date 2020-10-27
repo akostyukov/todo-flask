@@ -1,6 +1,7 @@
 from flask_login import current_user
 
 from app import db
+from app.decorators import commit_transaction
 
 
 class Task(db.Model):
@@ -13,15 +14,15 @@ class Task(db.Model):
         self.task = task
         self.user_id = user_id
 
+    @commit_transaction
     def set_done(self):
         self.status = False
-        db.session.commit()
 
+    @commit_transaction
     def delete_task(self):
         db.session.delete(Task.query.get(self.id))
-        db.session.commit()
 
     @staticmethod
+    @commit_transaction
     def clear_all():
         db.session.query(Task).filter(Task.user_id == current_user.id).delete()
-        db.session.commit()
