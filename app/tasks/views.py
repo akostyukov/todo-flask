@@ -22,9 +22,6 @@ class TaskView(FormView):
             'done_tasks': Task.query.filter_by(status=False, user_id=current_user.id).all(),
         }
 
-    def post(self):
-        return super().post()
-
 
 class DeleteTaskView(MethodView):
     decorators = [login_required]
